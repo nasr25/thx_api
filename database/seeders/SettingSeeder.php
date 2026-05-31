@@ -22,7 +22,7 @@ class SettingSeeder extends Seeder
             ['key' => 'monthly_appreciation_limit',  'value' => '10',                    'type' => 'integer', 'group' => 'rules'],
             ['key' => 'allow_self_appreciation',     'value' => '0',                     'type' => 'boolean', 'group' => 'rules'],
             ['key' => 'max_daily_appreciations',     'value' => '5',                     'type' => 'integer', 'group' => 'rules'],
-            ['key' => 'max_same_receiver_per_month', 'value' => '3',                     'type' => 'integer', 'group' => 'rules'],
+            ['key' => 'max_same_receiver_per_month', 'value' => '1',                     'type' => 'integer', 'group' => 'rules'],
 
             // Notifications
             ['key' => 'email_notifications_enabled', 'value' => '1',                     'type' => 'boolean', 'group' => 'notifications'],

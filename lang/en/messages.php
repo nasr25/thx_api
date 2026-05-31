@@ -18,6 +18,7 @@ return [
     'monthly_limit_reached' => 'You have reached your monthly appreciation limit of :limit.',
     'daily_limit_reached'  => 'You have reached your daily appreciation limit of :limit.',
     'same_receiver_limit'  => 'You have reached the maximum appreciations (:limit) for this person this month.',
+    'already_appreciated'  => 'You have already appreciated this employee this month. You can appreciate them again next month.',
 
     // Users
     'user_not_found'       => 'Employee not found.',

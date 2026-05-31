@@ -58,13 +58,15 @@ class AppreciationService
             );
         }
 
-        // Check max appreciations to same receiver per month
-        $maxSameReceiver = (int) Setting::getValue('max_same_receiver_per_month', 3);
+        // Check max appreciations to the SAME receiver per month (default 1).
+        $maxSameReceiver   = (int) Setting::getValue('max_same_receiver_per_month', 1);
         $sameReceiverCount = $this->appreciationRepository->getMonthlyCountForSenderToReceiver($sender->id, $receiverId);
 
         if ($sameReceiverCount >= $maxSameReceiver) {
+            // Clearer wording when only one appreciation per person is allowed.
+            $key = $maxSameReceiver === 1 ? 'messages.already_appreciated' : 'messages.same_receiver_limit';
             throw new \Exception(
-                __('messages.same_receiver_limit', ['limit' => $maxSameReceiver]),
+                __($key, ['limit' => $maxSameReceiver]),
                 422
             );
         }

@@ -10,7 +10,7 @@
         .header { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 40px 32px; text-align: center; }
         .header h1 { color: #fff; margin: 0; font-size: 28px; font-weight: 700; }
         .header p { color: rgba(255,255,255,0.85); margin: 8px 0 0; }
-        .heart { font-size: 48px; margin-bottom: 16px; display: block; }
+        .star { font-size: 48px; margin-bottom: 16px; display: block; }
         .body { padding: 40px 32px; }
         .greeting { font-size: 18px; color: #1f2937; margin-bottom: 24px; }
         .message-box { background: #f0f4ff; border-left: 4px solid #6366f1; border-radius: 8px; padding: 20px; margin: 24px 0; }
@@ -26,7 +26,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <span class="heart">❤️</span>
+        <span class="star">⭐</span>
         <h1>{{ $platformName }}</h1>
         <p>You received an appreciation!</p>
     </div>
@@ -43,7 +43,7 @@
         </div>
         @else
         <div class="message-box">
-            <p>❤️ A heartfelt appreciation — no words needed!</p>
+            <p>⭐ A star appreciation — no words needed!</p>
         </div>
         @endif
 
