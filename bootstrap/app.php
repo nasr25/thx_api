@@ -16,9 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
 
-        // ── CORS must be the very first middleware so preflight OPTIONS
-        //    requests are answered before any auth check runs.
-        $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
+        // ── Custom CORS middleware must be the very first in the entire stack.
+        //    It intercepts OPTIONS preflight instantly and adds CORS headers
+        //    to every response — including error responses — before auth runs.
+        $middleware->prepend(\App\Http\Middleware\CorsMiddleware::class);
 
         $middleware->api(prepend: [
             \App\Http\Middleware\SetLocale::class,

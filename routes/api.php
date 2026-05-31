@@ -1,6 +1,13 @@
 <?php
 
 use App\Http\Controllers\API\Auth\AuthController;
+use Illuminate\Support\Facades\Route;
+
+// ── Preflight (OPTIONS) catch-all ───────────────────────────────────────────
+// The browser sends an OPTIONS request before every cross-origin request.
+// Our CorsMiddleware already responds to OPTIONS before routing runs, but
+// this route is a safety net so the router never returns a 405/404 for OPTIONS.
+Route::options('{any}', fn () => response('', 204))->where('any', '.*');
 use App\Http\Controllers\API\Employee\EmployeeController;
 use App\Http\Controllers\API\Appreciation\AppreciationController;
 use App\Http\Controllers\API\NotificationController;
