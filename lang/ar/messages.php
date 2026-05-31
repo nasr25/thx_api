@@ -30,6 +30,8 @@ return [
     // Settings
     'settings_updated'     => 'تم تحديث الإعدادات بنجاح.',
     'logo_uploaded'        => 'تم رفع الشعار بنجاح.',
+    'role_updated'         => 'تم تحديث صلاحيات المستخدم بنجاح.',
+    'cannot_demote_self'   => 'لا يمكنك تغيير صلاحياتك الإدارية الخاصة.',
 
     // General
     'not_found'            => 'المورد غير موجود.',

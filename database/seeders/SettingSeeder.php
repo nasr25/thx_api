@@ -14,9 +14,9 @@ class SettingSeeder extends Seeder
             ['key' => 'platform_name_en',            'value' => 'Appreciation Platform', 'type' => 'string',  'group' => 'platform'],
             ['key' => 'platform_name_ar',            'value' => 'منصة التقدير',          'type' => 'string',  'group' => 'platform'],
             ['key' => 'logo_path',                   'value' => null,                    'type' => 'string',  'group' => 'platform'],
-            ['key' => 'primary_color',               'value' => '#6366f1',               'type' => 'string',  'group' => 'theme'],
-            ['key' => 'secondary_color',             'value' => '#f59e0b',               'type' => 'string',  'group' => 'theme'],
-            ['key' => 'accent_color',                'value' => '#10b981',               'type' => 'string',  'group' => 'theme'],
+            ['key' => 'primary_color',               'value' => '#004137',               'type' => 'string',  'group' => 'theme'],
+            ['key' => 'secondary_color',             'value' => '#00281E',               'type' => 'string',  'group' => 'theme'],
+            ['key' => 'accent_color',                'value' => '#000A0F',               'type' => 'string',  'group' => 'theme'],
 
             // Appreciation rules
             ['key' => 'monthly_appreciation_limit',  'value' => '10',                    'type' => 'integer', 'group' => 'rules'],

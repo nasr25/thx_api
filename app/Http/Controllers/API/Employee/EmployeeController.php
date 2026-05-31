@@ -76,6 +76,14 @@ class EmployeeController extends Controller
 
     public function show(int $id, Request $request): JsonResponse
     {
+        // Only an admin (or the employee themselves) may view a full profile/dashboard.
+        if (!$this->canViewProfile($request->user(), $id)) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.unauthorized'),
+            ], 403);
+        }
+
         $employee = $this->userRepository->findById($id);
 
         if (!$employee || !$employee->is_active) {
@@ -104,6 +112,13 @@ class EmployeeController extends Controller
 
     public function appreciations(int $id, Request $request): JsonResponse
     {
+        if (!$this->canViewProfile($request->user(), $id)) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.unauthorized'),
+            ], 403);
+        }
+
         $employee = $this->userRepository->findById($id);
 
         if (!$employee) {
@@ -127,5 +142,18 @@ class EmployeeController extends Controller
                 'total'        => $appreciations->total(),
             ],
         ]);
+    }
+
+    /**
+     * A profile/dashboard at /employees/{id} can be viewed only by an admin
+     * or by the employee themselves. Everyone else is forbidden.
+     */
+    private function canViewProfile(?\App\Models\User $viewer, int $targetId): bool
+    {
+        if (!$viewer) {
+            return false;
+        }
+        return $viewer->id === $targetId
+            || $viewer->hasAnyRole(['admin', 'super-admin']);
     }
 }

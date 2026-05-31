@@ -30,6 +30,8 @@ return [
     // Settings
     'settings_updated'     => 'Settings updated successfully.',
     'logo_uploaded'        => 'Logo uploaded successfully.',
+    'role_updated'         => 'User access updated successfully.',
+    'cannot_demote_self'   => 'You cannot change your own admin access.',
 
     // General
     'not_found'            => 'Resource not found.',

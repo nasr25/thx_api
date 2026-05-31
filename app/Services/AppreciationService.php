@@ -83,11 +83,14 @@ class AppreciationService
             'appreciation_id' => $appreciation->id,
         ]);
 
-        // Send notification (via queue)
+        // In-app notification for the receiver
         $this->notificationService->notifyNewAppreciation($appreciation);
 
-        if ((bool) Setting::getValue('email_notifications_enabled', true)) {
-            SendAppreciationEmailJob::dispatch($appreciation)->onQueue('notifications');
+        // Email the receiver. dispatchAfterResponse() runs in the same process
+        // right after the HTTP response is sent — no queue worker required, and
+        // it never blocks or breaks the appreciation if SMTP is slow/unavailable.
+        if ((bool) Setting::getValue('email_notifications_enabled', true) && $receiver->email) {
+            SendAppreciationEmailJob::dispatchAfterResponse($appreciation);
         }
 
         return $appreciation->load(['sender', 'receiver']);

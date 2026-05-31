@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\Admin\ActivityLogController;
 use App\Http\Controllers\API\Admin\AppreciationManagementController;
 use App\Http\Controllers\API\Admin\DashboardController;
+use App\Http\Controllers\API\Admin\UserManagementController;
 use App\Http\Controllers\API\PublicController;
 use App\Http\Controllers\API\Admin\ReportController;
 use App\Http\Controllers\API\Admin\SettingController;
@@ -77,5 +78,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/activity-logs',          [ActivityLogController::class, 'index'])->name('activity-logs.index');
         Route::get('/reports/analytics',      [ReportController::class, 'analytics'])->name('reports.analytics');
         Route::get('/reports/export',         [ReportController::class, 'export'])->name('reports.export');
+
+        // User management — grant/revoke admin access, activate/deactivate
+        Route::get('/users',                  [UserManagementController::class, 'index'])->name('users.index');
+        Route::put('/users/{id}/role',        [UserManagementController::class, 'updateRole'])->name('users.role');
+        Route::put('/users/{id}/status',      [UserManagementController::class, 'updateStatus'])->name('users.status');
     });
 });

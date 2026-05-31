@@ -95,15 +95,22 @@ class AppreciationController extends Controller
 
     public function dashboard(Request $request): JsonResponse
     {
-        $stats = $this->appreciationService->getDashboardStats($request->user());
+        $user  = $request->user();
+        $stats = $this->appreciationService->getDashboardStats($user);
+
+        $data = [
+            'stats'                => $stats['stats'],
+            'latest_appreciations' => AppreciationResource::collection($stats['latest_appreciations']),
+        ];
+
+        // Top-appreciated leaderboard is visible to admins only.
+        if ($user->hasAnyRole(['admin', 'super-admin'])) {
+            $data['leaderboard'] = $stats['leaderboard'];
+        }
 
         return response()->json([
             'success' => true,
-            'data'    => [
-                'stats'                => $stats['stats'],
-                'latest_appreciations' => AppreciationResource::collection($stats['latest_appreciations']),
-                'leaderboard'          => $stats['leaderboard'],
-            ],
+            'data'    => $data,
         ]);
     }
 }
