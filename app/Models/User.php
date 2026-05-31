@@ -97,12 +97,14 @@ class User extends Authenticatable
 
     // ─── Accessors ────────────────────────────────────────────────
 
-    public function getProfilePhotoUrlAttribute(): string
+    public function getProfilePhotoUrlAttribute(): ?string
     {
+        // No images in this deployment — the UI renders initials instead.
+        // Returns null so the frontend shows the initials avatar fallback.
         if ($this->profile_photo) {
             return asset('storage/' . $this->profile_photo);
         }
-        return asset('images/default-avatar.png');
+        return null;
     }
 
     public function getDisplayNameAttribute(): string

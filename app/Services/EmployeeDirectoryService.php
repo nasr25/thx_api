@@ -133,7 +133,8 @@ class EmployeeDirectoryService
             'email'      => $pick($fields['email']),
             'department' => $pick($fields['department']),
             'job_title'  => $pick($fields['job_title']),
-            'photo'      => $pick($fields['photo']),
+            // No images in this deployment — never store a photo.
+            'photo'      => null,
         ];
     }
 
