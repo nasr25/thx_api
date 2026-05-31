@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware) {
+
+        // ── CORS must be the very first middleware so preflight OPTIONS
+        //    requests are answered before any auth check runs.
+        $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
+
         $middleware->api(prepend: [
             \App\Http\Middleware\SetLocale::class,
         ]);
@@ -35,6 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
@@ -78,7 +84,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
                 return response()->json([
                     'success' => false,
-                    'message' => app()->isProduction() ? __('messages.server_error') : $e->getMessage(),
+                    'message' => app()->isProduction()
+                        ? __('messages.server_error')
+                        : $e->getMessage(),
                 ], $status);
             }
         });
