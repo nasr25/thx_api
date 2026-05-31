@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
+            \App\Http\Middleware\ForceJsonResponse::class,
             \App\Http\Middleware\SetLocale::class,
         ]);
 
@@ -37,6 +38,14 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+
+        // Force JSON error responses for every API route, regardless of the
+        // Accept header. Without this, an unauthenticated api/* request makes
+        // Laravel try to redirect to a (non-existent) "login" route, throwing
+        // "Route [login] not defined" as a 500 instead of a clean 401.
+        $exceptions->shouldRenderJsonWhen(function (Request $request, \Throwable $e) {
+            return $request->is('api/*') || $request->expectsJson();
+        });
 
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*')) {
