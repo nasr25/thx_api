@@ -8,58 +8,47 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CorsMiddleware
 {
-    private function allowedOrigins(): array
-    {
-        return array_filter(array_unique([
-            'http://localhost:5173',
-            'http://localhost:5174',
-            'http://localhost:3000',
-            'http://127.0.0.1:5173',
-            'http://127.0.0.1:5174',
-            env('FRONTEND_URL'),
-        ]));
-    }
-
     public function handle(Request $request, Closure $next): Response
     {
-        $origin = $request->header('Origin');
-
-        // ── Preflight (OPTIONS) — respond immediately, never touch the router ──
+        // Handle preflight OPTIONS instantly — never reaches the router
         if ($request->isMethod('OPTIONS')) {
-            return $this->buildPreflightResponse($origin);
+            $response = response('', 204);
+            $this->stamp($response, $request->header('Origin'));
+            return $response;
         }
 
         $response = $next($request);
-
-        $this->addCorsHeaders($response, $origin);
-
+        $this->stamp($response, $request->header('Origin'));
         return $response;
     }
 
-    private function buildPreflightResponse(?string $origin): Response
+    private function stamp(Response $response, ?string $origin): void
     {
-        $response = response('', 204);
-        $this->addCorsHeaders($response, $origin);
-        return $response;
-    }
-
-    private function addCorsHeaders(Response $response, ?string $origin): void
-    {
-        if ($origin && in_array($origin, $this->allowedOrigins(), true)) {
-            // Reflect the exact origin back (required when credentials: true)
+        // In local development allow every origin — no security risk on localhost
+        if (app()->environment('local', 'development')) {
+            $response->headers->set('Access-Control-Allow-Origin',      $origin ?: '*');
+            $response->headers->set('Access-Control-Allow-Credentials', $origin ? 'true' : 'false');
+        } elseif ($origin && $this->isAllowed($origin)) {
             $response->headers->set('Access-Control-Allow-Origin',      $origin);
             $response->headers->set('Access-Control-Allow-Credentials', 'true');
         }
 
         $response->headers->set('Access-Control-Allow-Methods',
             'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-
         $response->headers->set('Access-Control-Allow-Headers',
             'Content-Type, Accept, Authorization, X-Requested-With, X-Windows-User, Accept-Language, Origin, Cache-Control');
-
         $response->headers->set('Access-Control-Max-Age', '3600');
-
-        // Vary header tells browsers/CDNs the response differs per Origin
         $response->headers->set('Vary', 'Origin');
+    }
+
+    private function isAllowed(string $origin): bool
+    {
+        $allowed = array_filter([
+            env('FRONTEND_URL'),
+            'http://localhost:5173',
+            'http://localhost:5174',
+            'http://127.0.0.1:5173',
+        ]);
+        return in_array($origin, $allowed, true);
     }
 }

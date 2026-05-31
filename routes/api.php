@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\Admin\ActivityLogController;
 use App\Http\Controllers\API\Admin\AppreciationManagementController;
 use App\Http\Controllers\API\Admin\DashboardController;
+use App\Http\Controllers\API\PublicController;
 use App\Http\Controllers\API\Admin\ReportController;
 use App\Http\Controllers\API\Admin\SettingController;
 use App\Http\Controllers\API\Appreciation\AppreciationController;
@@ -12,9 +13,11 @@ use App\Http\Controllers\API\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // ── OPTIONS preflight catch-all ─────────────────────────────────────────────
-// Safety net: if the CORS middleware somehow doesn't intercept OPTIONS first,
-// the router returns 204 instead of 404/405.
 Route::options('{any}', fn () => response('', 204))->where('any', '.*');
+
+// ── Public endpoints (no auth required) ─────────────────────────────────────
+Route::get('/ping',            [PublicController::class, 'ping']);
+Route::get('/settings/public', [PublicController::class, 'settings']);
 
 // ── Windows Auth (IIS LOGON_USER → Bearer token) ────────────────────────────
 Route::middleware([\App\Http\Middleware\WindowsAuthMiddleware::class])
