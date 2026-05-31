@@ -7,6 +7,7 @@ use App\Http\Resources\AppreciationResource;
 use App\Http\Resources\UserResource;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Contracts\AppreciationRepositoryInterface;
+use App\Services\EmployeeDirectoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -15,6 +16,7 @@ class EmployeeController extends Controller
     public function __construct(
         protected UserRepositoryInterface $userRepository,
         protected AppreciationRepositoryInterface $appreciationRepository,
+        protected EmployeeDirectoryService $directoryService,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -40,13 +42,34 @@ class EmployeeController extends Controller
     {
         $request->validate(['q' => 'required|string|min:2|max:100']);
 
+        $term      = $request->input('q');
+        $currentId = $request->user()?->id;
+
+        // 1. If an external directory endpoint is configured, search it.
+        //    Each result is upserted into the local users table (so it has a
+        //    real ID and can receive appreciations).
+        if ($this->directoryService->isConfigured()) {
+            $external = $this->directoryService->search($term)
+                ->reject(fn ($u) => $u->id === $currentId);
+
+            if ($external->isNotEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'source'  => 'directory',
+                    'data'    => UserResource::collection($external),
+                ]);
+            }
+        }
+
+        // 2. Fall back to local database search.
         $results = $this->userRepository->search(
-            $request->input('q'),
+            $term,
             (int) $request->get('per_page', 10)
         );
 
         return response()->json([
             'success' => true,
+            'source'  => 'local',
             'data'    => UserResource::collection($results),
         ]);
     }
