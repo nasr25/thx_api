@@ -3,43 +3,50 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
 
 class PublicController extends Controller
 {
-    /** Quick reachability check — no auth, no DB needed */
+    /** No DB, no cache — just proves the API is reachable */
     public function ping(): JsonResponse
     {
         return response()->json([
             'success' => true,
             'message' => 'API is reachable',
-            'time'    => now()->toIso8601String(),
             'env'     => app()->environment(),
         ]);
     }
 
-    /** Public platform settings (name, logo, colors) — used by frontend before login */
+    /** Public platform branding — safe to call before login */
     public function settings(): JsonResponse
     {
-        $keys = [
-            'platform_name_en',
-            'platform_name_ar',
-            'primary_color',
-            'secondary_color',
-            'accent_color',
-            'logo_path',
-            'default_language',
-        ];
+        try {
+            $keys = [
+                'platform_name_en', 'platform_name_ar',
+                'primary_color', 'secondary_color',
+                'accent_color', 'logo_path', 'default_language',
+            ];
 
-        $settings = [];
-        foreach ($keys as $key) {
-            $settings[$key] = Setting::getValue($key);
+            $data = [];
+            foreach ($keys as $key) {
+                $data[$key] = \App\Models\Setting::getValue($key);
+            }
+
+            return response()->json(['success' => true, 'data' => $data]);
+        } catch (\Throwable) {
+            // DB not ready — return safe defaults so the frontend can still load
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'platform_name_en' => config('app.name', 'Appreciation Platform'),
+                    'platform_name_ar' => 'منصة التقدير',
+                    'primary_color'    => '#6366f1',
+                    'secondary_color'  => '#f59e0b',
+                    'accent_color'     => '#10b981',
+                    'logo_path'        => null,
+                    'default_language' => 'en',
+                ],
+            ]);
         }
-
-        return response()->json([
-            'success' => true,
-            'data'    => $settings,
-        ]);
     }
 }

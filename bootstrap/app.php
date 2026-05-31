@@ -16,11 +16,6 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
 
-        // ── Custom CORS middleware must be the very first in the entire stack.
-        //    It intercepts OPTIONS preflight instantly and adds CORS headers
-        //    to every response — including error responses — before auth runs.
-        $middleware->prepend(\App\Http\Middleware\CorsMiddleware::class);
-
         $middleware->api(prepend: [
             \App\Http\Middleware\SetLocale::class,
         ]);
@@ -44,39 +39,25 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => __('messages.not_found'),
-                ], 404);
+                return response()->json(['success' => false, 'message' => __('messages.not_found')], 404);
             }
         });
 
         $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, Request $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => __('messages.unauthenticated'),
-                    'code'    => 'UNAUTHENTICATED',
-                ], 401);
+                return response()->json(['success' => false, 'message' => __('messages.unauthenticated'), 'code' => 'UNAUTHENTICATED'], 401);
             }
         });
 
         $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e, Request $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => __('messages.unauthorized'),
-                ], 403);
+                return response()->json(['success' => false, 'message' => __('messages.unauthorized')], 403);
             }
         });
 
         $exceptions->render(function (\Illuminate\Validation\ValidationException $e, Request $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => __('messages.validation_error'),
-                    'errors'  => $e->errors(),
-                ], 422);
+                return response()->json(['success' => false, 'message' => __('messages.validation_error'), 'errors' => $e->errors()], 422);
             }
         });
 
@@ -85,9 +66,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
                 return response()->json([
                     'success' => false,
-                    'message' => app()->isProduction()
-                        ? __('messages.server_error')
-                        : $e->getMessage(),
+                    'message' => app()->isProduction() ? __('messages.server_error') : $e->getMessage(),
                 ], $status);
             }
         });
