@@ -64,6 +64,13 @@ class EmployeeDirectoryService
         try {
             $request = Http::timeout($timeout)->acceptJson();
 
+            // Internal AD/corporate endpoints often use self-signed or untrusted
+            // certificates. When EMPLOYEE_SEARCH_VERIFY=false, skip SSL verification
+            // so the request doesn't fail with a cURL certificate error.
+            if (!config('directory.verify', true)) {
+                $request = $request->withoutVerifying();
+            }
+
             if (!empty($token)) {
                 $request = $request->withToken($token);
             }

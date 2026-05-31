@@ -18,6 +18,7 @@ class TestDirectorySearch extends Command
         $timeout = config('directory.timeout', 10);
         $token   = config('directory.token');
         $key     = config('directory.results_key');
+        $verify  = config('directory.verify', true);
         $term    = $this->argument('term');
 
         $this->newLine();
@@ -27,6 +28,7 @@ class TestDirectorySearch extends Command
         $this->line("Query field  : {$field}");
         $this->line("Results key  : " . ($key ?: '(none — response is the array)'));
         $this->line("Token        : " . ($token ? '(set)' : '(none)'));
+        $this->line("SSL verify   : " . ($verify ? 'true' : 'false (insecure)'));
         $this->line("Timeout      : {$timeout}s");
         $this->newLine();
 
@@ -39,6 +41,9 @@ class TestDirectorySearch extends Command
 
         try {
             $request = Http::timeout($timeout)->acceptJson();
+            if (!$verify) {
+                $request = $request->withoutVerifying();
+            }
             if (!empty($token)) {
                 $request = $request->withToken($token);
             }

@@ -11,6 +11,10 @@ return [
     'timeout'     => (int) env('EMPLOYEE_SEARCH_TIMEOUT', 10),
     'token'       => env('EMPLOYEE_SEARCH_TOKEN', ''),
 
+    // Verify the endpoint's SSL certificate. Set EMPLOYEE_SEARCH_VERIFY=false
+    // for internal HTTPS endpoints with self-signed / untrusted certificates.
+    'verify'      => filter_var(env('EMPLOYEE_SEARCH_VERIFY', true), FILTER_VALIDATE_BOOLEAN),
+
     // JSON key that wraps the array (e.g. 'data'). Empty = response is the array.
     'results_key' => env('EMPLOYEE_SEARCH_RESULTS_KEY', ''),
 
