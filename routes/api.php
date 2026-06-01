@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\Admin\ActivityLogController;
 use App\Http\Controllers\API\Admin\AppreciationManagementController;
 use App\Http\Controllers\API\Admin\DashboardController;
+use App\Http\Controllers\API\Admin\ReasonManagementController;
 use App\Http\Controllers\API\Admin\UserManagementController;
 use App\Http\Controllers\API\PublicController;
 use App\Http\Controllers\API\Admin\ReportController;
@@ -55,6 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::prefix('appreciations')->group(function () {
         Route::post('/',        [AppreciationController::class, 'send'])->middleware('throttle:30,1')->name('appreciations.send');
+        Route::get('/reasons',  [AppreciationController::class, 'reasons'])->name('appreciations.reasons');
         Route::get('/received', [AppreciationController::class, 'received'])->name('appreciations.received');
         Route::get('/sent',     [AppreciationController::class, 'sent'])->name('appreciations.sent');
         Route::get('/feed',     [AppreciationController::class, 'feed'])->name('appreciations.feed');
@@ -83,5 +85,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/users',                  [UserManagementController::class, 'index'])->name('users.index');
         Route::put('/users/{id}/role',        [UserManagementController::class, 'updateRole'])->name('users.role');
         Route::put('/users/{id}/status',      [UserManagementController::class, 'updateStatus'])->name('users.status');
+
+        // Appreciation reasons — fully managed by super-admins only.
+        Route::middleware(['super-admin'])->group(function () {
+            Route::get('/reasons',            [ReasonManagementController::class, 'index'])->name('reasons.index');
+            Route::post('/reasons',           [ReasonManagementController::class, 'store'])->name('reasons.store');
+            Route::put('/reasons/{id}',       [ReasonManagementController::class, 'update'])->name('reasons.update');
+            Route::delete('/reasons/{id}',    [ReasonManagementController::class, 'destroy'])->name('reasons.destroy');
+        });
     });
 });

@@ -15,6 +15,7 @@ class Appreciation extends Model
     protected $fillable = [
         'sender_id',
         'receiver_id',
+        'reason_id',
         'message',
         'is_public',
         'deleted_by',
@@ -43,6 +44,11 @@ class Appreciation extends Model
     public function deletedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'deleted_by');
+    }
+
+    public function reason(): BelongsTo
+    {
+        return $this->belongsTo(AppreciationReason::class, 'reason_id');
     }
 
     // ─── Scopes ───────────────────────────────────────────────────

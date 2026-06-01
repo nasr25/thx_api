@@ -31,11 +31,17 @@ class RolePermissionSeeder extends Seeder
             'view-activity-logs',
             'export-reports',
             'manage-departments',
+
+            // Super-admin only
+            'manage-reasons',
         ];
 
         foreach ($permissions as $perm) {
             Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
         }
+
+        // Permissions reserved for the super-admin role.
+        $superAdminOnly = ['manage-reasons'];
 
         $employeeRole = Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'web']);
         $employeeRole->syncPermissions([
@@ -45,7 +51,7 @@ class RolePermissionSeeder extends Seeder
         ]);
 
         $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        $adminRole->syncPermissions($permissions);
+        $adminRole->syncPermissions(array_diff($permissions, $superAdminOnly));
 
         $superAdminRole = Role::firstOrCreate(['name' => 'super-admin', 'guard_name' => 'web']);
         $superAdminRole->syncPermissions($permissions);

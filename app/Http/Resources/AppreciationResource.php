@@ -15,6 +15,12 @@ class AppreciationResource extends JsonResource
             'is_public'  => $this->is_public,
             'created_at' => $this->created_at?->toIso8601String(),
             'formatted_date' => $this->created_at?->diffForHumans(),
+            'reason' => $this->whenLoaded('reason', fn () => $this->reason ? [
+                'id'           => $this->reason->id,
+                'name'         => $this->reason->name,
+                'name_ar'      => $this->reason->name_ar,
+                'display_name' => $this->reason->display_name,
+            ] : null),
             'sender' => $this->whenLoaded('sender', fn () => [
                 'id'             => $this->sender->id,
                 'full_name'      => $this->sender->full_name,

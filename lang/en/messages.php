@@ -20,6 +20,13 @@ return [
     'same_receiver_limit'  => 'You have reached the maximum appreciations (:limit) for this person this month.',
     'already_appreciated'  => 'You have already appreciated this employee this month. You can appreciate them again next month.',
 
+    // Appreciation reasons
+    'reason_required'      => 'Please select a reason for the appreciation.',
+    'reason_not_found'     => 'The selected reason is not available.',
+    'reason_created'       => 'Reason created successfully.',
+    'reason_updated'       => 'Reason updated successfully.',
+    'reason_deleted'       => 'Reason deleted successfully.',
+
     // Users
     'user_not_found'       => 'Employee not found.',
 

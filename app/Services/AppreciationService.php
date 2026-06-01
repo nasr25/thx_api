@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ActivityLog;
 use App\Models\Appreciation;
+use App\Models\AppreciationReason;
 use App\Models\Setting;
 use App\Models\User;
 use App\Repositories\Contracts\AppreciationRepositoryInterface;
@@ -18,12 +19,19 @@ class AppreciationService
         protected NotificationService $notificationService,
     ) {}
 
-    public function send(User $sender, int $receiverId, ?string $message = null, bool $isPublic = true): Appreciation
+    public function send(User $sender, int $receiverId, int $reasonId, ?string $message = null, bool $isPublic = true): Appreciation
     {
         $receiver = $this->userRepository->findById($receiverId);
 
         if (!$receiver) {
             throw new \Exception(__('messages.user_not_found'), 404);
+        }
+
+        // Reason must exist and be active.
+        $reason = AppreciationReason::active()->find($reasonId);
+
+        if (!$reason) {
+            throw new \Exception(__('messages.reason_not_found'), 422);
         }
 
         // Prevent self-appreciation
@@ -74,6 +82,7 @@ class AppreciationService
         $appreciation = $this->appreciationRepository->create([
             'sender_id'   => $sender->id,
             'receiver_id' => $receiverId,
+            'reason_id'   => $reason->id,
             'message'     => $message ? strip_tags(trim($message)) : null,
             'is_public'   => $isPublic,
         ]);
@@ -93,7 +102,7 @@ class AppreciationService
             SendAppreciationEmailJob::dispatchAfterResponse($appreciation);
         }
 
-        return $appreciation->load(['sender', 'receiver']);
+        return $appreciation->load(['sender', 'receiver', 'reason']);
     }
 
     public function delete(int $appreciationId, User $admin, string $reason = ''): bool

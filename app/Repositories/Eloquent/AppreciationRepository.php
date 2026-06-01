@@ -12,12 +12,12 @@ class AppreciationRepository implements AppreciationRepositoryInterface
 {
     public function findById(int $id): ?Appreciation
     {
-        return Appreciation::with(['sender', 'receiver'])->find($id);
+        return Appreciation::with(['sender', 'receiver', 'reason'])->find($id);
     }
 
     public function getForUser(int $userId, int $perPage = 15): LengthAwarePaginator
     {
-        return Appreciation::with(['sender.department'])
+        return Appreciation::with(['sender.department', 'reason'])
             ->where('receiver_id', $userId)
             ->orderByDesc('created_at')
             ->paginate($perPage);
@@ -25,7 +25,7 @@ class AppreciationRepository implements AppreciationRepositoryInterface
 
     public function getSentByUser(int $userId, int $perPage = 15): LengthAwarePaginator
     {
-        return Appreciation::with(['receiver.department'])
+        return Appreciation::with(['receiver.department', 'reason'])
             ->where('sender_id', $userId)
             ->orderByDesc('created_at')
             ->paginate($perPage);
@@ -105,7 +105,7 @@ class AppreciationRepository implements AppreciationRepositoryInterface
 
     public function getLatestForUser(int $userId, int $limit = 5): Collection
     {
-        return Appreciation::with(['sender.department'])
+        return Appreciation::with(['sender.department', 'reason'])
             ->where('receiver_id', $userId)
             ->orderByDesc('created_at')
             ->limit($limit)
@@ -114,7 +114,7 @@ class AppreciationRepository implements AppreciationRepositoryInterface
 
     public function getPublicFeed(int $perPage = 20): LengthAwarePaginator
     {
-        return Appreciation::with(['sender.department', 'receiver.department'])
+        return Appreciation::with(['sender.department', 'receiver.department', 'reason'])
             ->public()
             ->orderByDesc('created_at')
             ->paginate($perPage);

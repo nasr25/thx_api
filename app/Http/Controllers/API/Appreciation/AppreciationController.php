@@ -4,7 +4,9 @@ namespace App\Http\Controllers\API\Appreciation;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Appreciation\SendAppreciationRequest;
+use App\Http\Resources\AppreciationReasonResource;
 use App\Http\Resources\AppreciationResource;
+use App\Models\AppreciationReason;
 use App\Repositories\Contracts\AppreciationRepositoryInterface;
 use App\Services\AppreciationService;
 use Illuminate\Http\JsonResponse;
@@ -23,6 +25,7 @@ class AppreciationController extends Controller
             $appreciation = $this->appreciationService->send(
                 $request->user(),
                 (int) $request->input('receiver_id'),
+                (int) $request->input('reason_id'),
                 $request->input('message'),
                 (bool) $request->input('is_public', true)
             );
@@ -38,6 +41,20 @@ class AppreciationController extends Controller
                 'message' => $e->getMessage(),
             ], $e->getCode() ?: 422);
         }
+    }
+
+    /** Active reasons for the appreciation form (radio options). */
+    public function reasons(): JsonResponse
+    {
+        $reasons = AppreciationReason::active()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data'    => AppreciationReasonResource::collection($reasons),
+        ]);
     }
 
     public function received(Request $request): JsonResponse

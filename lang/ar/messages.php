@@ -20,6 +20,13 @@ return [
     'same_receiver_limit'  => 'لقد وصلت إلى الحد الأقصى للتقدير (:limit) لهذا الشخص هذا الشهر.',
     'already_appreciated'  => 'لقد قمت بتقدير هذا الموظف هذا الشهر بالفعل. يمكنك تقديره مرة أخرى الشهر القادم.',
 
+    // Appreciation reasons
+    'reason_required'      => 'يرجى اختيار سبب للتقدير.',
+    'reason_not_found'     => 'السبب المحدد غير متاح.',
+    'reason_created'       => 'تم إنشاء السبب بنجاح.',
+    'reason_updated'       => 'تم تحديث السبب بنجاح.',
+    'reason_deleted'       => 'تم حذف السبب بنجاح.',
+
     // Users
     'user_not_found'       => 'الموظف غير موجود.',
 
