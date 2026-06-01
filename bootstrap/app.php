@@ -25,7 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin'              => \App\Http\Middleware\AdminMiddleware::class,
             'super-admin'        => \App\Http\Middleware\SuperAdminMiddleware::class,
-            'windows.auth'       => \App\Http\Middleware\WindowsAuthMiddleware::class,
             'role'               => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission'         => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,

@@ -22,11 +22,14 @@ Route::get('/ping',            [PublicController::class, 'ping']);
 Route::get('/settings/public', [PublicController::class, 'settings']);
 
 // ── Windows Auth (IIS LOGON_USER → Bearer token) ────────────────────────────
-Route::middleware([\App\Http\Middleware\WindowsAuthMiddleware::class])
-    ->prefix('auth')
-    ->group(function () {
-        Route::get('/windows', [AuthController::class, 'windowsAuth'])->name('auth.windows');
-    });
+// No Laravel auth middleware: identity is read directly from the IIS Windows
+// Authentication server variables inside the controller. IIS itself is the gate
+// (Anonymous Authentication is disabled for this path in web.config).
+Route::prefix('auth')->group(function () {
+    Route::get('/windows', [AuthController::class, 'windowsAuth'])
+        ->middleware('throttle:30,1')
+        ->name('auth.windows');
+});
 
 // ── Admin form login ─────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {

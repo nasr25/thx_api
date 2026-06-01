@@ -40,9 +40,50 @@ class AuthService
 
     // ─── Windows Authentication (IIS) ────────────────────────────────────────
 
-    public function windowsAuthToken(User $user): array
+    /**
+     * Issue a Bearer token for a Windows-authenticated user.
+     *
+     * Receives the normalized username (e.g. "john.doe") taken from the IIS
+     * server variables — NOT a Laravel User. Resolves the local user, syncing
+     * from Active Directory or auto-creating on first sight, then issues a token.
+     *
+     * @param  string       $username     Normalized Windows username.
+     * @param  string|null  $rawIdentity  Original IIS value (e.g. "DOMAIN\\john.doe"), for AD sync/logging.
+     */
+    public function windowsAuthToken(string $username, ?string $rawIdentity = null): array
     {
+        $user = $this->resolveWindowsUser($username, $rawIdentity ?? $username);
+
+        if (!$user->is_active) {
+            throw new \Exception(__('messages.account_inactive'), 403);
+        }
+
         return $this->issueToken($user, 'windows_auth');
+    }
+
+    /**
+     * Find the local user for a Windows username, or provision one:
+     *   1. Existing local record (fast path).
+     *   2. Sync from Active Directory when LDAP is configured.
+     *   3. Auto-create a minimal record (no AD required).
+     */
+    private function resolveWindowsUser(string $username, string $rawIdentity): User
+    {
+        $user = $this->userRepository->findByUsername($username);
+
+        if ($user) {
+            $user->update(['last_login_at' => now()]);
+            return $user;
+        }
+
+        if ($this->ldapService->isConfigured()) {
+            $ldapData = $this->ldapService->findUser($username);
+            if ($ldapData) {
+                return $this->syncFromLdap($ldapData, $rawIdentity);
+            }
+        }
+
+        return $this->createFromWindowsIdentity($username, $rawIdentity);
     }
 
     public function syncFromLdap(array $ldapData, string $windowsIdentity = ''): User
